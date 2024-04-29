@@ -1,9 +1,19 @@
-<html lang="en">
-<body>
-  {% if name %}
-  <h1>Hello {{name}} from HTML file</h1>
-  {% else %}
-  <h1>Hello WORLD from HTML file</h1>
-  {% endif %}
-</body>
+<html>
+  <body>
+    {% if name %}
+    <h1>Hello {{ name }}</h1>
+    {% else %}
+    <h1>Hello World</h1>
+    {% endif %}
+    
+    {% if products %}
+    <ul>
+      {% for product in products %}
+      <li>{{ product.title }} - ${{ product.unit_price }}</li>
+      {% endfor %}
+    </ul>
+    {% else %}
+    <p>No products found.</p>
+    {% endif %}
+  </body>
 </html>
