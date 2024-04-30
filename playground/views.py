@@ -1,12 +1,11 @@
 from django.shortcuts import render
-from django.db.models import Q, F
+from django.db.models import Q, F, Value
 from django.db.models.aggregates import Count, Max, Min, Avg, Sum
-from store.models import Product, OrderItem, Order
+from store.models import Product, OrderItem, Order, Customer
 
 
 def say_hello(request):
-    result = Product.objects.filter(unit_price__lt=30).aggregate(
-        count=Count("id"), min_price=Min("unit_price")
-    )
+    # queryset = Customer.objects.annotate(is_new=Value(True))
+    queryset = Customer.objects.annotate(new_id=F("id") + 1)
 
-    return render(request, "hello.html", {"name": "Ahmed", "result": result})
+    return render(request, "hello.html", {"name": "Ahmed", "result": list(queryset)})
