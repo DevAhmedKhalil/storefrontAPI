@@ -6,14 +6,10 @@
     <h1>Hello World</h1>
     {% endif %}
     
-    {% if products %}
     <ul>
-      {% for product in products %}
-      <li>{{ product.title }} - ${{ product.unit_price }}</li>
+      {% for order in orders %}
+      <li>{{ order.id }} - ${{ order.customer.first_name }}</li>
       {% endfor %}
     </ul>
-    {% else %}
-    <p>No products found.</p>
-    {% endif %}
   </body>
 </html>

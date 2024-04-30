@@ -1,22 +1,36 @@
 from django.shortcuts import render
 from django.db.models import Q, F
-from store.models import Product
+from store.models import Product, OrderItem, Order
 
 
 def say_hello(request):
-    # keyword=value
-    # queryset = Product.objects.filter(unit_price__range=(20, 40))
-    # queryset = Product.objects.filter(title__icontains="coffee")
+    # # Sorting
+    # queryset = Product.objects.order_by("unit_price", "-title").reverse()
 
-    # products: where inventroy < 10 AND unit_price < 20
-    # queryset = Product.objects.filter(inventory__lt=10, unit_price__lt=20)
-    # queryset = Product.objects.filter(inventory__lt=10).filter(unit_price__lt=20)
+    # # Limitization 0, 1, 2, 3, 4
+    # queryset = Product.objects.all()[0:5]
 
-    # products: where inventroy < 10 OR unit_price < 20
-    # queryset = Product.objects.filter(Q(inventory__lt=10) | Q(unit_price__lt=20))
-    # queryset = Product.objects.filter(Q(inventory__lt=10) & ~Q(unit_price__lt=20))
+    # # Pagenation 5, 6, 7, 8, 9
+    # queryset = Product.objects.all()[5:10]
 
-    # products: where inventroy = unit_price
-    queryset = Product.objects.filter(inventory=F("collection__id"))
+    # Selecting Fields To Query
+    # queryset = Product.objects.values("id", "title", "collection__title")
+    # orderedProducts = OrderItem.objects.values("product_id").distinct()
+    # queryset = Product.objects.filter(id__in=orderedProducts).order_by("title")
 
-    return render(request, "hello.html", {"name": "Mosh", "products": list(queryset)})
+    # # Deferring Fields
+    # # only -> only use this columns if U didn't it will take a long sql queries
+    # queryset = Product.objects.only("id", "title")
+    # # defer -> don't use id column if U use it it will take a long sql queries
+    # queryset = Product.objects.defer("id")
+
+    # Selecting Related Objects
+    # queryset = Product.objects.select_related("collection").all()
+
+    queryset = (
+        Order.objects.select_related("customer")
+        .prefetch_related("orderitem_set__product")
+        .order_by("-placed_at")[:5]
+    )
+
+    return render(request, "hello.html", {"name": "Ahmed", "orders": list(queryset)})
