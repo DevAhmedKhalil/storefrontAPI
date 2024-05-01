@@ -1,10 +1,23 @@
 from django.shortcuts import render
-from django.contrib.contenttypes.models import ContentType
-from store.models import Product
-from tags.models import TaggedItem
+from store.models import Product, Collection
 
 
 def say_hello(request):
-    queryset = TaggedItem.objects.get_tags_for(Product, 1)
+    # 1) Best way to creatin object
+    collection = Collection()
+    collection.title = "Video Games"
+    collection.featured_product = Product(pk=1)
+    # OR
+    # collection.featured_product_id = 1
+    collection.save()
 
-    return render(request, "hello.html", {"name": "Ahmed", "tags": list(queryset)})
+    # # 2) Using constractor
+    # collection = Collection(title="Test Collection", featured_product_id=1)
+    # collection.save()
+
+    # 3) Using create method
+    # collection = Collection.objects.create(
+    #     title="Test Collection", featured_product_id=1
+    # )
+
+    return render(request, "hello.html", {"name": "Ahmed"})
