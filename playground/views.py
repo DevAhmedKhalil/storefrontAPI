@@ -3,11 +3,11 @@ from store.models import Product, Collection
 
 
 def say_hello(request):
-    # # 1) Updating object -> use .get to update only 'title'
-    # collection = Collection.objects.get(pk=11)
-    # collection.title = "Games"
-    # collection.save()
+    # 1) Delete object
+    collection = Collection(pk=11)
+    collection.delete()
 
-    # 2) Update object using update method
-    Collection.objects.filter(pk=11).update(featured_product=None)
+    # 2) Delete object using delete()
+    Collection.objects.filter(id__gt=10).delete()
+
     return render(request, "hello.html", {"name": "Ahmed"})
