@@ -1,29 +1,14 @@
-from typing import Any
-from django.contrib import admin
+from django.contrib import admin, messages
 from django.db.models.query import QuerySet
 from . import models
 
 
-class InventoryFilter(admin.SimpleListFilter):
-    title = "inventory"
-    parameter_name = "inventory"
-
-    def lookups(self, request, model_admin):
-        return [("<10", "Low"), (">=10", "Ok")]
-
-    def queryset(self, request: Any, queryset: QuerySet[Any]) -> QuerySet[Any] | None:
-        if self.value() == "<10":
-            return queryset.filter(inventory__lt=10)
-        elif self.value() == ">=10":
-            return queryset.filter(inventory__gte=10)
-        return None
-
-
 @admin.register(models.Product)
 class ProductAdmin(admin.ModelAdmin):
+    actions = ["clear_inventory"]
     list_display = ["title", "unit_price", "inventory_status", "collection_title"]
     list_editable = ["unit_price"]
-    list_filter = ["collection", "last_update", InventoryFilter]
+    list_filter = ["collection", "last_update", "inventory"]
     list_per_page = 10
     list_select_related = ["collection"]
 
@@ -32,9 +17,20 @@ class ProductAdmin(admin.ModelAdmin):
 
     @admin.display(ordering="inventory")
     def inventory_status(self, product):
-        if product.inventory < 10:
-            return "Low"
-        return "Ok"
+        return "Low" if product.inventory < 10 else "Ok"
+
+    @admin.action(description="Clear inventory")
+    def clear_inventory(self, request, queryset):
+        # Update the inventory of selected products to 0
+        updated_count = queryset.update(inventory=0)
+        self.message_user(
+            request,
+            f"{updated_count} products were successfully updated.",
+            messages.SUCCESS,
+        )
+
+
+# clear_inventory.short_description = "Clear inventory"
 
 
 @admin.register(models.Customer)
@@ -51,4 +47,3 @@ class OrderAdmin(admin.ModelAdmin):
 
 
 admin.site.register(models.Collection)
-# admin.site.register(models.Product, ProductAdmin)
