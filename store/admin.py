@@ -9,6 +9,7 @@ class ProductAdmin(admin.ModelAdmin):
     prepopulated_fields = {
         "slug": ["title"],
     }
+    search_fields = ["title"]  # Add this line to specify search fields
     # fields = ["title", "slug"]
     # exclude = ["promotions"]  # Opposite of fields
     # readonly_fields = ["title"]
@@ -46,12 +47,6 @@ class CustomerAdmin(admin.ModelAdmin):
     list_per_page = 10
 
 
-@admin.register(models.Order)
-class OrderAdmin(admin.ModelAdmin):
-    autocomplete_fields = ["customer"]
-    list_display = ["id", "placed_at", "customer"]
-
-
 # admin.site.register(models.Collection)
 @admin.register(models.Collection)
 class CollectionAdmin(admin.ModelAdmin):
@@ -61,3 +56,20 @@ class CollectionAdmin(admin.ModelAdmin):
     @admin.display(ordering="products_count")
     def products_count(self, collection):
         return collection.product_set.count()
+
+
+# ORDER ITEMS => Table to add orders of products
+class OrderItemInline(admin.StackedInline):
+    # class OrderItemInline(admin.TabularInline):
+    autocomplete_fields = ["product"]
+    model = models.OrderItem
+    extra = 0
+    min_num = 1
+    max_num = 10
+
+
+@admin.register(models.Order)
+class OrderAdmin(admin.ModelAdmin):
+    autocomplete_fields = ["customer"]
+    inlines = [OrderItemInline]
+    list_display = ["id", "placed_at", "customer"]
