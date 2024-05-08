@@ -10,17 +10,18 @@ from .serializers import ProductSerializer
 # Create your views here. View Function:
 @api_view()
 def product_list(request):
-    queryset = Product.objects.all()
-    serializer = ProductSerializer(queryset, many=True)
+    queryset = Product.objects.select_related("collection").all()
+    serializer = ProductSerializer(queryset, many=True, context={"request": request})
     return Response(serializer.data)
 
 
 @api_view()
 def product_detail(request, id):
-    # try:
-    # product = Product.objects.get(pk=id)
     product = get_object_or_404(Product, pk=id)
     serializer = ProductSerializer(product)
     return Response(serializer.data)
-    # except Product.DoesNotExist:
-    # return Response(status=status.HTTP_404_NOT_FOUND)
+
+
+@api_view()
+def collection_detail(request, pk):
+    return Response("ok")
