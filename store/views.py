@@ -18,8 +18,11 @@ def product_list(request):
         return Response(serializer.data)
     elif request.method == "POST":
         serializer = ProductSerializer(data=request.data)
-        # serializer.validated_data
-        return Response("lol")
+        serializer.is_valid(
+            raise_exception=True
+        )  # raise exception replaced if(is_valid) else block
+        print(serializer.validated_data)
+        return Response("ok")
 
 
 @api_view()
