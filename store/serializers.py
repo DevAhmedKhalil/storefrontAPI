@@ -15,7 +15,16 @@ class CollectionSerializer(serializers.ModelSerializer):
 class ProductSerializer(serializers.ModelSerializer):
     class Meta:
         model = Product
-        fields = ["id", "title", "unit_price", "price_with_tax", "collection"]
+        fields = [
+            "id",
+            "title",
+            "description",
+            "slug",
+            "inventory",
+            "unit_price",
+            "price_with_tax",
+            "collection",
+        ]
         # fields = "__all__" # this is for lazy developers
 
     price_with_tax = serializers.SerializerMethodField(method_name="calculate_tax")
@@ -27,3 +36,14 @@ class ProductSerializer(serializers.ModelSerializer):
     #     if data["password"] != data["confirm_password"]:
     #         return serializers.ValidationError("Password Don't Match.")
     #     return data
+
+    # def create(self, validated_data):
+    #     product = Product(**validated_data)
+    #     product.other = 1  # special field
+    #     product.save()
+    #     return product
+
+    # def update(self, instance, validated_data):
+    #     instance.unit_price = validated_data.get("unit_price")
+    #     instance.save()
+    #     return instance
