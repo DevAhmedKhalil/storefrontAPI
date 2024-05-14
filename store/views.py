@@ -6,50 +6,46 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework.mixins import ListModelMixin, CreateModelMixin
 from rest_framework.generics import ListCreateAPIView, RetrieveUpdateDestroyAPIView
+from rest_framework.viewsets import ModelViewSet
 from rest_framework import status
 from .models import Product, Collection, OrderItem
 from .serializers import ProductSerializer, CollectionSerializer
 
 
-class ProductList(ListCreateAPIView):
+# class ProductList(ListCreateAPIView):
+# class ProductDetail(RetrieveUpdateDestroyAPIView):
+class ProductViewSet(ModelViewSet):
     queryset = Product.objects.all()
     serializer_class = ProductSerializer
 
-    def get_serializer_context(self):
-        return {"request": self.request}
-
-
-class ProductDetail(RetrieveUpdateDestroyAPIView):
-
-    queryset = Product.objects.all()
-    serializer_class = ProductSerializer
-
-    def delete(self, request, pk):
-        product = get_object_or_404(Product, pk=pk)
-        if product.orderitems.count() > 0:
+    def destroy(self, request, *args, **kwargs):
+        instance = self.get_object()
+        if OrderItem.objects.filter(product=instance).exists():
+            print("ERROR 💥💥")  # This should print if there are associated OrderItems
             return Response(
-                {"Error": "Can Not Delete This product, has order items."},
+                {
+                    "Error": "Cannot delete this product as it has associated order items."
+                },
                 status=status.HTTP_400_BAD_REQUEST,
             )
-        product.delete()
+        self.perform_destroy(instance)
         return Response(status=status.HTTP_204_NO_CONTENT)
 
 
-class CollectionList(ListCreateAPIView):
+# class CollectionList(ListCreateAPIView):
+# class CollectionDetails(RetrieveUpdateDestroyAPIView):
+class CollectionViewSet(ModelViewSet):
     queryset = Collection.objects.annotate(products_count=Count("products")).all()
     serializer_class = CollectionSerializer
 
-
-class CollectionDetails(RetrieveUpdateDestroyAPIView):
-    queryset = Collection.objects.annotate(products_count=Count("products")).all()
-    serializer_class = CollectionSerializer
-
-    def delete(self, request, pk):
-        collection = get_object_or_404(Collection, pk=pk)
-        if collection.products.count() > 0:
+    def destroy(self, request, *args, **kwargs):
+        instance = self.get_object()
+        if instance.products.count() > 0:
             return Response(
-                {"Error": "Can Not Delete This collection, has products."},
+                {
+                    "Error": "Cannot delete this collection as it has associated products."
+                },
                 status=status.HTTP_400_BAD_REQUEST,
             )
-        collection.delete()
+        self.perform_destroy(instance)
         return Response(status=status.HTTP_204_NO_CONTENT)
