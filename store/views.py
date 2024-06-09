@@ -5,15 +5,17 @@ from rest_framework.response import Response
 from rest_framework.mixins import (
     CreateModelMixin,
     RetrieveModelMixin,
+    UpdateModelMixin,
     DestroyModelMixin,
 )
 from rest_framework.viewsets import ModelViewSet, GenericViewSet
 from rest_framework import status
-from .models import Cart, CartItem, Product, Collection, OrderItem, Review
+from .models import Cart, CartItem, Customer, Product, Collection, OrderItem, Review
 from .serializers import (
     AddCartItemSerializer,
     CartItemSerializer,
     CartSerializer,
+    CustomerSerializer,
     ProductSerializer,
     CollectionSerializer,
     ReviewSerializer,
@@ -100,3 +102,10 @@ class CartItemViewSet(ModelViewSet):  # Support All Operations
     def get_queryset(self):
         return CartItem.objects.filter(cart_id=self.kwargs["cart_pk"])
         # .select_related("product")  -> it's add a query in SQL
+
+
+class CustomerViewSet(
+    CreateModelMixin, RetrieveModelMixin, UpdateModelMixin, GenericViewSet
+):
+    queryset = Customer.objects.all()
+    serializer_class = CustomerSerializer
