@@ -18,6 +18,7 @@ from rest_framework.permissions import (
 from store.permissions import (
     FullDjangoModelPermissions,
     IsAdminOrReadOnly,
+    ViewCustomerHistoryPermission,
 )
 from .models import Cart, CartItem, Customer, Product, Collection, OrderItem, Review
 from .serializers import (
@@ -119,6 +120,10 @@ class CustomerViewSet(ModelViewSet):
     queryset = Customer.objects.all()
     serializer_class = CustomerSerializer
     permission_classes = [IsAdminUser]
+
+    @action(detail=True, permission_classes=[ViewCustomerHistoryPermission])
+    def history(self, request, pk):
+        return Response("Ok")
 
     @action(detail=False, methods=["GET", "PUT"], permission_classes=[IsAuthenticated])
     def me(self, request):
