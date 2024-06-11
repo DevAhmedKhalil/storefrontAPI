@@ -9,3 +9,8 @@ class IsAdminOrReadOnly(permissions.BasePermission):
 
         # For non-safe methods, check if the user is authenticated and is an admin
         return bool(request.user and request.user.is_staff)
+
+
+class FullDjangoModelPermissions(permissions.DjangoModelPermissions):
+    def __init__(self) -> None:
+        self.perms_map["GET"] = ["%(app_label)s.view_%(model_name)s"]

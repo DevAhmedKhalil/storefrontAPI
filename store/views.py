@@ -12,7 +12,13 @@ from rest_framework.viewsets import ModelViewSet, GenericViewSet
 from rest_framework import status
 from rest_framework.decorators import action
 from rest_framework.permissions import IsAuthenticated, AllowAny, IsAdminUser
-from store.permissions import IsAdminOrReadOnly
+from rest_framework.permissions import (
+    DjangoModelPermissionsOrAnonReadOnly,
+)  # Correct import
+from store.permissions import (
+    FullDjangoModelPermissions,
+    IsAdminOrReadOnly,
+)
 from .models import Cart, CartItem, Customer, Product, Collection, OrderItem, Review
 from .serializers import (
     AddCartItemSerializer,
