@@ -20,12 +20,13 @@ from store.permissions import (
     IsAdminOrReadOnly,
     ViewCustomerHistoryPermission,
 )
-from .models import Cart, CartItem, Customer, Product, Collection, OrderItem, Review
+from .models import Cart, CartItem, Customer, Order, Product, Collection, OrderItem, Review
 from .serializers import (
     AddCartItemSerializer,
     CartItemSerializer,
     CartSerializer,
     CustomerSerializer,
+    OrderSerializer,
     ProductSerializer,
     CollectionSerializer,
     ReviewSerializer,
@@ -136,3 +137,8 @@ class CustomerViewSet(ModelViewSet):
             serializer.is_valid(raise_exception=True)
             serializer.save()
             return Response(serializer.data)
+
+
+class OrderViewSet(ModelViewSet):
+    queryset = Order.objects.all()
+    serializer_class = OrderSerializer
